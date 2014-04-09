@@ -152,10 +152,6 @@ def enable_cros(fn):
     return _enable_cros
     
 
-@route('/ping')
-def ping():
-    return "<h2><b>I'm ready to test Monarch</h2></b>"
-
 @route('/selecttests')
 def selectTests():
     selectTestsHTMLFile = SelectTestCasesHTMLMaker().makeTestSelectorHTML()
