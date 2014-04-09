@@ -127,8 +127,8 @@ class SelectTestCasesHTMLMaker():
         return HTMLPage
 
 #-------------------------------------------------------------------------------------------------------------------------------------
-from ExtLib.bottle import bottle
-from ExtLib.bottle.bottle import route,run,request,response,static_file
+from ExtLib import bottle
+from ExtLib.bottle import route,run,request,response,static_file
 from ExtLib import HTMLTestRunner
 from ExtLib import HTMLIndexCreator
 import unittest
