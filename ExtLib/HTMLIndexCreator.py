@@ -1,3 +1,5 @@
+testEngineers = ''
+
 import os
 import sys
 
@@ -75,7 +77,7 @@ class HTMLIndexCreator():
         <div id="Results" style="width:84.7%;background-color:white;float:right;text-align:left;height:95%;">
         <iframe id="loadHTMLResults" frameborder="0" style="height:100%;width:100%;"></iframe>
         </div>
-        <div id="footer" style="width:100%;text-align:left;color:lightgrey;background-color:"""+self.theme+""";">Test Engineer(s) : Parthiban, Pavithra</div>
+        <div id="footer" style="width:100%;text-align:left;color:lightgrey;background-color:"""+self.theme+""";">Test Engineer(s) :"""+testEngineers+"""</div>
         </div>
         </body>
         </html>
