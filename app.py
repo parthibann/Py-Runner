@@ -1,5 +1,9 @@
+# -- Config Settings :
+_serverIpAddress = 'localhost'
+_port = '1903'
+
 #-----------------------------------------------------------------------------------------------------------------------
-#------------------------------ SelectTests Template --------------------------------------------------------
+#------------------------------ SelectTests Template -------------------------------------------------------------------
 #-----------------------------------------------------------------------------------------------------------------------
 import unittest
 import TestManager
@@ -13,8 +17,8 @@ class SelectTestCasesHTMLMaker():
         """
         self.listOfTestSuites = TestManager.TestManager().TestSuites()
         self.theme = _theme
-        #self.machineIpAddress = socket.gethostbyname(socket.gethostname()) #Enable this on windows environments
-        self.machineIpAddress = '192.168.6.124'
+        self.serverIpAddress = _serverIpAddress
+        self.port = _port
 
              
     def makeTestCases(self):
@@ -86,7 +90,7 @@ class SelectTestCasesHTMLMaker():
                   chkId += $(this).val() + ",";
                 });
                 testCases = chkId;
-                $.ajax({type:'POST',url:"http://"""+self.machineIpAddress+""":1903/runtest",data : JSON.stringify({"testCases":testCases}),dataType: "json",success:function(){alert('success')},error: function(e){alert(JSON.stringify(e))},contentType: "application/json; charset=utf-8"});
+                $.ajax({type:'POST',url:"http://"""+self.serverIpAddress+""":"""+self.port+"""/runtest",data : JSON.stringify({"testCases":testCases}),dataType: "json",success:function(){alert('success')},error: function(e){alert(JSON.stringify(e))},contentType: "application/json; charset=utf-8"});
               });
               $('.selectAllTestCases').click( function(){
                 $('.chkTest').prop('checked',$(this).is(':checked'));
@@ -211,5 +215,5 @@ def getTestSuiteNames(testCases):
     return list(set(testSuites))
         
 
-run(host='192.168.6.124',port=1903,debug=False)
+run(host=_serverIpAddress,port=_port,debug=False)
 
