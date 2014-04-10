@@ -99,11 +99,21 @@ class HTMLIndexCreator():
             elif _file.lower().endswith(".htm"):
                 HTMLFiles.append(_file)
         return HTMLFiles
+
+    def deleteIndexFileIfExists(self):
+	"""
+	To delete the index.html file if it is already exists in the mentioned directory.
+	"""
+	try:
+	    os.remove(self.dir+'/index.html')
+	except OSError:
+	    pass
     
     def makeLinks(self):
         """
         To make TestSuite Links
         """
+	self.deleteIndexFileIfExists()
         _fileNames = self.getHTMLFileNames()
         _msgPart1 = "<a href=\""
         _msgPart2 = "\" target=\"loadHTMLResults\">"
