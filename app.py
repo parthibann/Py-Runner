@@ -90,7 +90,8 @@ class SelectTestCasesHTMLMaker():
                   chkId += $(this).val() + ",";
                 });
                 testCases = chkId;
-                $.ajax({type:'POST',url:"http://"""+self.serverIpAddress+""":"""+self.port+"""/runtest",data : JSON.stringify({"testCases":testCases}),dataType: "json",success:function(){alert('success')},error: function(e){alert(JSON.stringify(e))},contentType: "application/json; charset=utf-8"});
+		var selectedRunner = $('input[name=testRunner]:radio:checked').val()
+                $.ajax({type:'POST',url:"http://"""+self.serverIpAddress+""":"""+self.port+"""/runtest",data : JSON.stringify({"testCases":testCases,"Runner":selectedRunner}),dataType: "json",success:function(){alert('success')},error: function(e){alert(JSON.stringify(e))},contentType: "application/json; charset=utf-8"});
               });
               $('.selectAllTestCases').click( function(){
                 $('.chkTest').prop('checked',$(this).is(':checked'));
