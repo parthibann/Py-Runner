@@ -1,6 +1,7 @@
 # -- Config Settings :
 _serverIpAddress = 'localhost'
 _port = '1903'
+_testlinkURL = 'http://localhost/testlink/lib/api/xmlrpc/v1/xmlrpc.php'
 
 #-----------------------------------------------------------------------------------------------------------------------
 #------------------------------ SelectTests Template -------------------------------------------------------------------
@@ -91,10 +92,10 @@ class SelectTestCasesHTMLMaker():
                   chkId += $(this).val() + ",";
                 });
                 testCases = chkId;
-		var selectedRunner = $('input[name=testRunner]:radio:checked').val()
-		var userId = $('input:text[name=useridtxtbox]').val();
-		var testPlanId = $('input:text[name=testplantxtbox]').val();
-		var buildName = $('input:text[name=buildnametxtbox]').val();
+		        var selectedRunner = $('input[name=testRunner]:radio:checked').val()
+		        var userId = $('input:text[name=useridtxtbox]').val();
+		        var testPlanId = $('input:text[name=testplantxtbox]').val();
+		        var buildName = $('input:text[name=buildnametxtbox]').val();
                 $.ajax({type:'POST',url:"http://"""+self.serverIpAddress+""":"""+self.port+"""/runtest",data : JSON.stringify({"testCases":testCases,"Runner":selectedRunner,"userId":userId,"testPlanId":testPlanId,"buildName":buildName}),dataType: "json",success:function(){alert('success')},error: function(e){alert(JSON.stringify(e))},contentType: "application/json; charset=utf-8"});
               });
               $('.selectAllTestCases').click( function(){
@@ -123,9 +124,9 @@ class SelectTestCasesHTMLMaker():
         
         HTMLPart5 = """</div>
         <div id="TLRunner" style="background-color:"""+self.theme+""";font-weight:bold;text-align:center;width:100%;display:none;">User Id:
-	<input type="text" name="useridtxtbox" placeholder="Enter User Id *" size=14>TestPlan Id :
-	<input type="text" name="testplantxtbox" placeholder="Enter TestPlan Id *" size=14>Build Name :
-	<input type="text" name="buildnametxtbox" placeholder="Enter Build Name *" size=14></div>
+	    <input type="text" name="useridtxtbox" placeholder="Enter User Id *" size=14>TestPlan Id :
+	    <input type="text" name="testplantxtbox" placeholder="Enter TestPlan Id *" size=14>Build Name :
+	    <input type="text" name="buildnametxtbox" placeholder="Enter Build Name *" size=14></div>
         <div id="runner" style="background-color:"""+self.theme+""";font-weight:bold;text-align:center;width:100%;">Select Runner : 
         <input type="radio" name="testRunner" class="runnerRadio" value="HTMLTestRunner" checked>HTMLTestRunner
         <input type="radio" name="testRunner" class="runnerRadio" value="TestLinkRunner">TestLinkRunner
@@ -144,6 +145,7 @@ from ExtLib import bottle
 from ExtLib.bottle import route,run,request,response,static_file
 from ExtLib import HTMLTestRunner
 from ExtLib import HTMLIndexCreator
+from ExtLib.TestLinkRunner import TestLinkRunner
 import unittest
 import os
 import json
@@ -178,27 +180,45 @@ def runtest():
     response = json.loads(request.body.read())
     testCases = (str(response['testCases'])).split(',')
     testCases.pop()
+    _runner = (str(response['Runner']))
+    _buildName = (str(response['buildName']))
+    _userId = (str(response['userId']))
+    _testPlanId = (str(response['testPlanId']))
     totalTestCases = len(testCases)
-    if totalTestCases == 0:
-        return "Select testcases to run.."
-    else:
-        listOfTestSuiteNames = getTestSuiteNames(testCases)
-        for testSuite in listOfTestSuiteNames:
+    if _runner == 'HTMLTestRunner':
+        if totalTestCases == 0:
+            return "Select testcases to run.."
+        else:
+            listOfTestSuiteNames = getTestSuiteNames(testCases)
+            for testSuite in listOfTestSuiteNames:
+                suite = unittest.TestSuite()
+                for testCase in testCases:
+                    testSuiteName = ((str(testCase).split(' '))[0]).split('.')[-1]
+                    if testSuite == testSuiteName:
+                        _testSuiteName = ((str(testCase)).split(' ')[0])[1:]
+                        classObj = my_import(_testSuiteName)
+                        _testCaseName = ((((str(testCase)).split(' ')[1])[:-1]).split('='))[1]
+                        suite.addTest(classObj(_testCaseName))
+                        _testModuleName = testSuiteName#((str(testSuite).split(".")[-1])[0:-2])    
+                _output = open(pwd+"/Output/"+_testModuleName+".html","w")
+                HTMLRunner = HTMLTestRunner.HTMLTestRunner(stream=_output,title=_testModuleName,description="Test case's for the module "+_testModuleName)
+                HTMLRunner.run(suite)
+        IndexMaker = HTMLIndexCreator.HTMLIndexCreator(pwd+"/Output/")
+        IndexMaker.makeHTMLIndexFile()    
+        return "Test(s) complete....."
+    elif _runner == 'TestLinkRunner':
+        _TLRunner = TestLinkRunner(_testlinkURL,_userId,_testPlanId,_buildName)
+        if totalTestCases == 0:
+            return "Select testcases to run.."
+        else:
             suite = unittest.TestSuite()
             for testCase in testCases:
-                testSuiteName = ((str(testCase).split(' '))[0]).split('.')[-1]
-                if testSuite == testSuiteName:
-                    _testSuiteName = ((str(testCase)).split(' ')[0])[1:]
-                    classObj = my_import(_testSuiteName)
-                    _testCaseName = ((((str(testCase)).split(' ')[1])[:-1]).split('='))[1]
-                    suite.addTest(classObj(_testCaseName))
-                    _testModuleName = testSuiteName#((str(testSuite).split(".")[-1])[0:-2])    
-            _output = open(pwd+"/Output/"+_testModuleName+".html","w")
-            HTMLRunner = HTMLTestRunner.HTMLTestRunner(stream=_output,title=_testModuleName,description="Test case's for the module "+_testModuleName)
-            HTMLRunner.run(suite)
-    IndexMaker = HTMLIndexCreator.HTMLIndexCreator(pwd+"/Output/")
-    IndexMaker.makeHTMLIndexFile()    
-    return "Test(s) complete....."
+                _testSuiteName = ((str(testCase)).split(' ')[0])[1:]
+                classObj = my_import(_testSuiteName)
+                _testCaseName = ((((str(testCase)).split(' ')[1])[:-1]).split('='))[1]
+                suite.addTest(classObj(_testCaseName))
+            _TLRunner.run(suite)
+        return "Test(s) complete....."
 
 
 def my_import(importName):

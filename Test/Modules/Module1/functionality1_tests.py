@@ -14,13 +14,13 @@ class functionality1(unittest.TestCase):
         """ clear the objects that are created in the setup.
         """
         
-    def test_testcase1(self):
+    def test_11_testcase1(self):
         """ Explain about testcase1 here.
         I'm simply passing the test case here
         """
         pass
     
-    def test_testcase2(self):
+    def test_14_testcase2(self):
         """ Explain about testcase2 here.
         I'm simply failing the test case here
         """
