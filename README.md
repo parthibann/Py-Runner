@@ -24,3 +24,8 @@ Thanks to all the contributors of the above mentioned projects.
   * Run the application `python app.py`
   * open borwser and log on to the url `http://ipaddress:port/selecttests` and select test cases and click run button to run the testcases, once the test cases are completed you get a pop-up stating "test(s) completed..."
   * once you got that pop-up open another tab in browser and log on to the url `http://ipaddress:port/results/index.html` for viewing the results.
+
+## Explanation : ##
+
+  * This project follows the following tree structure (not necessary to follow the same structure) :
+![py-runner](https://cloud.githubusercontent.com/assets/4667360/2958070/0f029822-daa6-11e3-9bb2-e3892e0e587f.PNG)
