@@ -16,3 +16,11 @@ Py-Runner
   * [Testlink Runner](https://github.com/parthibann/Python-TestLink-Runner "Testlink Runner") - Testlink runner is used to post the automation results to testlink api, so that results are stored in testlink database.
 
 Thanks to all the contributors of the above mentioned projects.
+
+## Usage : ##
+
+  * Clone this project `git clone https://github.com/parthibann/Py-Runner.git`
+  * Edit app.py file and update your server ip address in "_serverIpAddress" variable and testlink xmlrpc link in "_testlinkURL" variable.
+  * Run the application `python app.py`
+  * open borwser and log on to the url `http://ipaddress:port/selecttests` and select test cases and click run button to run the testcases, once the test cases are completed you get a pop-up stating "test(s) completed..."
+  * once you got that pop-up open another tab in browser and log on to the url `http://ipaddress:port/results/index.html` for viewing the results.
