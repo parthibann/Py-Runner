@@ -25,6 +25,10 @@ Thanks to all the contributors of the above mentioned projects.
   * open borwser and log on to the url `http://ipaddress:port/selecttests` and select test cases and click run button to run the testcases, once the test cases are completed you get a pop-up stating "test(s) completed..."
   * once you got that pop-up open another tab in browser and log on to the url `http://ipaddress:port/results/index.html` for viewing the results.
 
+## System Requirements : ##
+
+  * Python 2.7 or above
+
 ## Explanation : ##
 
   * This project follows the following tree structure (not necessary to follow the same structure) :
