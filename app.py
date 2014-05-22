@@ -1,6 +1,6 @@
 # -- Config Settings :
-_serverIpAddress = 'localhost'
-_port = '1903'
+_serverIpAddress = '192.168.6.124'
+_port = '1905'
 _testlinkURL = 'http://localhost/testlink/lib/api/xmlrpc/v1/xmlrpc.php'
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -67,14 +67,30 @@ class SelectTestCasesHTMLMaker():
         To make test suite Links
         """
         links = ""
-        linksPart1 = "<a href=\"#"
-        linksPart2 = "\">"
-        linksPart3 = "</a><br>"
+        linksPart1 = "<input type=\"checkbox\" name=\""
+        linksPart2 = "\" class=\""
+        linksPart3 = "\"><a href=\"#"
+        linksPart4 = "\">"
+        linksPart5 = "</a><br>"
         testSuites = self.getTestSuiteNames()
         for suite in testSuites:
-            link = linksPart1+suite+linksPart2+suite+linksPart3
+            link = linksPart1+suite+linksPart2+suite+linksPart3+suite+linksPart4+suite+linksPart5
             links = links+link
-        return links              
+        return links
+
+    def makeTestSuiteSelectionJquery(self):
+        """
+        To make individual test suite selection jquery
+        """
+        Jquery = ""
+        part1 = "$('."
+        part2 = "').click( function(){$('input[name="
+        part3 = "]').prop('checked',$(this).is(':checked'));});"
+        testSuites = self.getTestSuiteNames()
+        for suite in testSuites:
+            _jquery = part1+suite+part2+suite+part3
+            Jquery = Jquery+_jquery
+        return Jquery
                 
     def makeTestSelectorHTML(self):
         """
@@ -100,7 +116,7 @@ class SelectTestCasesHTMLMaker():
               });
               $('.selectAllTestCases').click( function(){
                 $('.chkTest').prop('checked',$(this).is(':checked'));
-              });
+              });"""+self.makeTestSuiteSelectionJquery()+"""
             });
         </script>
         </head>
@@ -239,6 +255,5 @@ def getTestSuiteNames(testCases):
         testSuites.append(testSuiteName)
     return list(set(testSuites))
         
-
 run(host=_serverIpAddress,port=_port,debug=False)
 
