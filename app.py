@@ -1,5 +1,5 @@
 # -- Config Settings :
-_serverIpAddress = '192.168.6.124'
+_serverIpAddress = 'localhost'
 _port = '1905'
 _testlinkURL = 'http://localhost/testlink/lib/api/xmlrpc/v1/xmlrpc.php'
 
