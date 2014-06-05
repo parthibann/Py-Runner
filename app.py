@@ -8,20 +8,20 @@ _testlinkURL = 'http://localhost/testlink/lib/api/xmlrpc/v1/xmlrpc.php'
 #-----------------------------------------------------------------------------------------------------------------------
 import unittest
 import TestManager
-import socket
 
 class SelectTestCasesHTMLMaker():
     """
+    This class will take the list of testcases which is returned from TestManager.py and transforms it into html page which will allow the user to select test cases to run.
     """
     def __init__(self,_theme='skyblue'):
         """
+        Initializing global variables.
         """
         self.listOfTestSuites = TestManager.TestManager().TestSuites()
         self.theme = _theme
         self.serverIpAddress = _serverIpAddress
         self.port = _port
 
-             
     def makeTestCases(self):
         """
         To display test cases
@@ -158,7 +158,7 @@ class SelectTestCasesHTMLMaker():
 
 #-------------------------------------------------------------------------------------------------------------------------------------
 from ExtLib import bottle
-from ExtLib.bottle import route,run,request,response,static_file
+from ExtLib.bottle import route,run,request,response,static_file,error,redirect
 from ExtLib import HTMLTestRunner
 from ExtLib import HTMLIndexCreator
 from ExtLib.TestLinkRunner import TestLinkRunner
@@ -166,6 +166,7 @@ import unittest
 import os
 import json
 
+#---------------------------------------------------------------------------------------------------
 def enable_cros(fn):
     def _enable_cros(*args,**kwargs):
         """
@@ -178,20 +179,32 @@ def enable_cros(fn):
             return fn(*args, **kwargs)
     return _enable_cros
     
-
+#----------------------------------------------------------------------------------------------------
 @route('/selecttests')
 def selectTests():
+    """
+    It will return TestSelector Html page.
+    """
     selectTestsHTMLFile = SelectTestCasesHTMLMaker().makeTestSelectorHTML()
     return selectTestsHTMLFile
 
+#-----------------------------------------------------------------------------------------------------
+@route('/results/')
 @route('/results/:filename')
-def results(filename):
+def results(filename='index.html'):
+    """
+    This will return the results of executed test cases, static html reports are served using this route.
+    """
     _rootPath = os.path.abspath(os.path.dirname(__file__))
     return static_file(filename,root=_rootPath+'/Output')
 
+#------------------------------------------------------------------------------------------------------
 @route('/runtest',method=['POST','OPTIONS'])
 @enable_cros
 def runtest():
+    """
+    This method will run the testcases selected in TestSelector.html page
+    """
     pwd = os.path.abspath(os.path.dirname(__file__))
     response = json.loads(request.body.read())
     testCases = (str(response['testCases'])).split(',')
@@ -238,6 +251,9 @@ def runtest():
 
 
 def my_import(importName):
+    """
+    Takes a class name as input and returns that class object.
+    """
     className = importName.split('.')[-1]
     moduleName = importName[:-(len(className)+1)]
     mod = __import__(moduleName)
@@ -248,12 +264,24 @@ def my_import(importName):
     return class_
 
 def getTestSuiteNames(testCases):
+    """
+    Returns unique testsuite names of the given testcases.
+    """
     testSuites = []
     for testCase in testCases:
         testSuite = (str(testCase).split(' '))[0]
         testSuiteName = testSuite.split('.')[-1]
         testSuites.append(testSuiteName)
     return list(set(testSuites))
-        
+
+#-----------------------------------------------------------------------
+@error(404)
+def error404(error):
+    """
+    Returns the following contents for "Resource not found"
+    """
+    return '<strong><center><h3>The Resource you are looking for is currently not available or removed.</h3></center></strong>'
+
+#------------------------------------------------------------------------        
 run(host=_serverIpAddress,port=_port,debug=False)
 
