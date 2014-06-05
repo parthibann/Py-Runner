@@ -65,8 +65,8 @@ class HTMLIndexCreator():
         part1 = """<html>
         <body>
         <title>Index</title>
-        <div id="container" style="width=100%;text-align:center;border:5px solid black;border-radius:10px;">
-        <div id="pageTitle" style="background-color:"""+self.theme+""";font-size:20pt;font-weight:bold;">Index</div>
+        <div id="container" style="width=100%;text-align:center;">
+        <div id="pageTitle" style="background-color:"""+self.theme+""";text-align:left;font-weight:bold;">Index</div>
         <div id="whiteSpace" style="height:0.3%;background-color:white;"></div>
         <div id="TestSuitesTitle" style="width:15%;float:left;background-color:"""+self.theme+""";font-weight:bold;">TestSuites</div>
         <div id="ResultsTitle" style="width:84.7%;float:right;background-color:"""+self.theme+""";font-weight:bold;">Results</div>

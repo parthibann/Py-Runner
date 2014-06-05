@@ -94,6 +94,7 @@ class SelectTestCasesHTMLMaker():
                 
     def makeTestSelectorHTML(self):
         """
+        makes testSelector Html page and returns it.
         """
         HTMLPart1 = """
         <html>
@@ -121,8 +122,8 @@ class SelectTestCasesHTMLMaker():
         </script>
         </head>
         <body><title>Select TestCases</title>
-        <div id="container" style="width:100%;text-align:center;border:5px solid black;border-radius:10px;">
-        <div id="pageTitle" style="background-color:"""+self.theme+""";font-size:18pt;font-weight:bold;">Test Selector</div>
+        <div id="container" style="width:100%;text-align:center;">
+        <div id="pageTitle" style="background-color:"""+self.theme+""";text-align:left;font-weight:bold;">Test Selector</div>
         
         <div id="whiteSpace" style="height:0.3%;"></div>
         
@@ -156,7 +157,52 @@ class SelectTestCasesHTMLMaker():
         HTMLPage = (HTMLPart1+HTMLPart2+HTMLPart3+HTMLPart4+HTMLPart5)
         return HTMLPage
 
-#-------------------------------------------------------------------------------------------------------------------------------------
+#----------------------------------- End of Test Selector template --------------------------------
+
+#--------------------------------------------------------------------------------------------------
+#----------------------------------- Home page Template -------------------------------------------
+#--------------------------------------------------------------------------------------------------
+class makeHomePageHTML():
+    """
+    It will return the homepage of py-runner
+    """
+
+    def __init__(self,_theme="skyblue"):
+        """
+        Initializing global variables
+        """
+        self.theme = _theme
+        self.serverIpAddress = _serverIpAddress
+        self.port = _port
+
+    def getHtmlHomePage(self):
+        """
+        It will make the home page html source and return it.
+        """
+        HTMLPageSource = """<html>
+        <body>
+        <title>Py-UnittestRunner</title>
+        <div id="container" style="width:99.9%;height:99%;text-align:center;">
+        <div id="pageTitle" style="background-color:"""+self.theme+""";font-size:18pt;font-weight:bold;">Py-Unittest Runner</div>
+        <div id="space" style="height:0.3%;"></div>
+        <div id="pageTitle" style="background-color:"""+self.theme+""";font-size:10pt;font-weight:bold;">
+        <table>
+        <tr><td><a href="http://"""+self.serverIpAddress+""":"""+self.port+"""/selecttests" target="loadPage">TestSelector</a></td><td>| <a href="http://"""+self.serverIpAddress+""":"""+self.port+"""/results/" target="loadPage">Results</a></td></tr>
+        </table>
+        </div>
+        <hr>
+        <div id="page" style="width:100%;background-color:white;float:left;text-align:left;height:89.7%;">
+        <iframe id="loadPage" name="loadPage" frameborder="0" style="height:100%;width:100%;"></iframe>
+        </div>
+        </div>
+        </body>
+        </html>
+        """
+        return HTMLPageSource
+
+#----------------------------------- End of Home page Template ------------------------------------
+
+#--------------------------------------------------------------------------------------------------
 from ExtLib import bottle
 from ExtLib.bottle import route,run,request,response,static_file,error,redirect
 from ExtLib import HTMLTestRunner
@@ -274,13 +320,23 @@ def getTestSuiteNames(testCases):
         testSuites.append(testSuiteName)
     return list(set(testSuites))
 
-#-----------------------------------------------------------------------
+#------------------------------------------------------------------------
 @error(404)
 def error404(error):
     """
     Returns the following contents for "Resource not found"
     """
     return '<strong><center><h3>The Resource you are looking for is currently not available or removed.</h3></center></strong>'
+
+#------------------------------------------------------------------------
+@route('/')
+@route('/pyrunner')
+def py_runner():
+    """
+    It will return the home page of the application.
+    """
+    _homePage = makeHomePageHTML().getHtmlHomePage()
+    return _homePage
 
 #------------------------------------------------------------------------        
 run(host=_serverIpAddress,port=_port,debug=False)
