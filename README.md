@@ -19,7 +19,7 @@ Thanks to all the contributors of the above mentioned projects.
 
 ## Usage : ##
 
-  * Clone this project `git clone https://github.com/parthibann/Py-Runner.git`
+  * Clone this project `git clone https://github.com/parthibann/Py-Runner.git` or download it.
   * Edit app.py file and update your server ip address in "_serverIpAddress" variable and testlink xmlrpc link in "_testlinkURL" variable.
   * Run the application `python app.py`
   * open borwser and log on to the url `http://ipaddress:port`, it will open the py-unittestRunner home page. 
