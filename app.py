@@ -208,6 +208,7 @@ from ExtLib.bottle import route,run,request,response,static_file,error,redirect
 from ExtLib import HTMLTestRunner
 from ExtLib import HTMLIndexCreator
 from ExtLib.TestLinkRunner import TestLinkRunner
+from ExtLib import Statistics
 import unittest
 import os
 import json
@@ -278,6 +279,8 @@ def runtest():
                 _output = open(pwd+"/Output/"+_testModuleName+".html","w")
                 HTMLRunner = HTMLTestRunner.HTMLTestRunner(stream=_output,title=_testModuleName,description="Test case's for the module "+_testModuleName)
                 HTMLRunner.run(suite)
+        statsReport = Statistics.makeStatisticsReport(pwd+"/Output")
+        statsReport.getStatisticsReport()
         IndexMaker = HTMLIndexCreator.HTMLIndexCreator(pwd+"/Output/")
         IndexMaker.makeHTMLIndexFile()    
         return "Test(s) complete....."
