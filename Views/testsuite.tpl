@@ -43,7 +43,7 @@ $('.{{suite}}').click( function(){$('input[name={{suite}}]').prop('checked',$(th
 <input type="text" name="buildnametxtbox" placeholder="Enter Build Name *" size=14></div>
 <div id="runner">Select Runner : 
 <input type="radio" name="testRunner" class="runnerRadio" value="HTMLTestRunner" checked>HTMLTestRunner
-<!--<input type="radio" name="testRunner" class="runnerRadio" value="TestLinkRunner">TestLinkRunner-->
+<input type="radio" name="testRunner" class="runnerRadio" value="TestLinkRunner">TestLinkRunner
 <input type="checkbox" class="selectAllTestCases" />Select All Test Cases
 <button type="button" class="RunSelectedTests">Run</button></div>
 </div>
