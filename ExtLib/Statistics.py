@@ -1,242 +1,155 @@
-# Usage :
-# This module contains a class "googleChart" which is used to form source code of charts.
-# It makes only the chart source and not the entire HTML source, so it has to be wrapped with the HTML source as following.
-# HTML Sample Source :
-#        <html>
-#        <head>
-#        <script type="text/javascript" src="https://www.google.com/jsapi"></script> 
-#------- Here is the place where you want to call the getChart function from googleChart class to get the chart source.
-#------- (e.g) a = googleChart()
-#------- a.getChart("PieChart","['Result', 'Total'],['Pass',11],['Fail',7]","test","colors: ['green','red']")
-#        </head>
-#        <body>
-#------- the title used for creating charts only has to used for the div id.
-#        <div id="titleUsedForChart" style="width: 900px; height: 500px;"></div>
-#        </body>
-#        </html>
-
-class googleChart():
-    """
-    This will make pie-charts and column-charts using google api.
-    """
-
-    def getChart(self,chartType,data,title,colors=None):
-        """
-        It will make the entire pie-chart HTML source and return it.
-        ARGS :
-		ARG 1 - > chartType is mandatory argument
-		chartType can be either "PieChart" or "BarChart"
-		ARG 2 -> data is mandatoy argument
-		Input for data has to be given in this format : "['Result', 'Total'],['Pass',11],['Fail',7]"
-		ARG 3 - > title is mandatory argument
-		title can be any string that represents the chart.
-		ARG 4 - > colors is an optional argument
-		Input for colours has to be given in this format : "colors: ['green','red']"
-		"""
-        part1="""
-        <script type="text/javascript">
-        google.load("visualization", "1", {packages:["corechart"]});
-        google.setOnLoadCallback(drawChart);
-        function drawChart() {
-        var data = google.visualization.arrayToDataTable([
-        """+data+"""
-        ]);
-        var options = {
-        title: '"""+title+"""'"""
-        if colors==None:
-            _colors=""
-        else:
-            _colors=","+colors
-        part2=_colors+"""};
-        var chart = new google.visualization."""+chartType+"""(document.getElementById('"""+title+"""'));
-        chart.draw(data, options);
-        }
-        </script>
-        """
-        return part1+part2
-	
-#------------------------------------------------------------------------------------------------------------
 import os
 import sys
 
-class makeStatisticsReport():
-    """
-    This is used to make the statistics html report.
-    """
-    def __init__(self,_dir):
-        """
-        Initializing global variables.
-        """
-        self.dir=_dir
-        self.gchart=googleChart()
+wd = os.path.abspath(os.path.dirname(__file__))
+outputDir = wd+"/../Output/"
 
-    def getHTMLFileNames(self):
-        """
-        To get the list of files with .html or .htm extension and return it.
-        """
-        HTMLFiles = []
-        for _file in os.listdir(self.dir):
-            if _file.lower().endswith(".html"):
-                HTMLFiles.append(_file)
-            elif _file.lower().endswith(".htm"):
-                HTMLFiles.append(_file)
-        return HTMLFiles
+def deleteStatisticsFileIfExists(_outputDir=outputDir):
+    """ """
+    try:
+        os.remove(_outputDir+'statistics.html')
+    except OSError:
+        pass
 
-    def getStatisticsFromHTMLTestOutput(self):
-        """
-        To get the statistics from each testsuite report and return it as json object.
-        """
-        _resultData = ""
-        _outputFiles = self.getHTMLFileNames()
-        for file in _outputFiles:
-            filename = "{"+file[:-5]+":"
-            file = self.dir+"/"+file
-            _resultData=_resultData+str(filename)
-            with open(file) as infile:
-                copy = False
-                for line in infile:
-                    if line.strip()=="<tr id='total_row'>":
-                        copy=True
-                    elif line.strip() == "<td>&nbsp;</td>":
-                        copy=False
-                    elif copy:
-                        _line = (str(line).replace('    <td>','')).rstrip('\r\n')
-                        _replaceLine = str(_line).replace('</td>',':')
-                        _resultData=_resultData+_replaceLine
-            _resultData=_resultData+"},"
-        return _resultData
-                        
+def getHtmlFileNames(_outputDir=outputDir):
+    """ """
+    deleteStatisticsFileIfExists(_outputDir)
+    HTMLFiles = []
+    for _file in os.listdir(_outputDir):
+        if _file.lower().endswith(".html"):
+            if _file.lower() == "index.html":
+                pass
+            else:
+                HTMLFiles.append(_file)
+        elif _file.lower().endswith(".htm"):
+            if _file.lower() == "index.htm":
+                pass
+            else:
+                HTMLFiles.append(_file)
+    return HTMLFiles
+
+def getStatisticsFromHtmlTestOutput(_outputDir=outputDir):
+    """ """
+    _stats = []
+    _outputFiles = getHtmlFileNames(_outputDir)
+    for file in _outputFiles:
+        _file = _outputDir+file
+        with open(_file) as infile:
+            _Data = ""
+            _Data =  str(file[:-5]) + "!~!"
+            copy = False
+            for line in infile:
+                if line.strip()=="<tr id='total_row'>":
+                    copy=True
+                elif line.strip() == "<td>&nbsp;</td>":
+                    copy=False
+                elif copy:
+                    _line = (str(line).replace('    <td>','')).rstrip('\r\n')
+                    _replaceLine = str(_line).replace('</td>','!~!')
+                    _Data=_Data + _replaceLine
+            _stats.append(_Data)
+    return _stats
+
+class overviewReport():
+    def __init__(self,projectName,_outputDir=outputDir):
+        self.outputDir = _outputDir
+        self.projectName = projectName
+        self.reportData = getStatisticsFromHtmlTestOutput(self.outputDir)
+
     def getTotalPassed(self):
-        """
-        To get the total passed test cases.
-        """
-        _totalPassed = 0
-        statistics = self.getStatisticsFromHTMLTestOutput()
-        _suiteStats=statistics.split(',')
-        for suite in _suiteStats:
-            if suite.count(':')==6:
-			    _totalPassed = _totalPassed + int(suite.split(':')[3])
-        return _totalPassed
+        """ """
+        totalPassed = 0
+        stats = self.reportData
+        for stat in stats:
+            passed = stat.split('!~!')[3]
+            totalPassed = totalPassed + int(passed)
+        return totalPassed
 
     def getTotalFailed(self):
-        """
-		To get the total failed test cases.
-        """
-        _totalFailed = 0
-        statistics = self.getStatisticsFromHTMLTestOutput()
-        _suiteStats=statistics.split(',')
-        for suite in _suiteStats:
-            if suite.count(':')==6:
-			    _totalFailed = _totalFailed + int(suite.split(':')[4])
-        return _totalFailed
+        """ """
+        totalFailed = 0
+        stats = self.reportData
+        for stat in stats:
+            failed = stat.split('!~!')[4]
+            totalFailed = totalFailed + int(failed)
+        return totalFailed
 
-    def getOverallStatistics(self):
-        """
-        To make overall statistics.
-        """
-        _totalPassed = self.getTotalPassed()
-        _totalFailed = self.getTotalFailed()
-        _details = "['Result', 'Total'],['Pass',"+str(_totalPassed)+"],['Fail',"+str(_totalFailed)+"]"
-        return _details		
+    def getTotalError(self):
+        """ """
+        totalError = 0
+        stats = self.reportData
+        for stat in stats:
+            error = stat.split('!~!')[5]
+            totalError = totalError + int(error)
+        return totalError
 
-    def getTestCoverageStatistics(self):
-        """
-        To get the test coverage statistics.
-        """
-        _data = "['Suite Name', 'Total Test Cases'],"
-        statistics = self.getStatisticsFromHTMLTestOutput()
-        _suiteStats=statistics.split(',')
-        for suite in _suiteStats:
-            if suite.count(':')==6:
-                _suiteDetails = suite.split(':')
-                _suiteName = _suiteDetails[0][1:]
-                _total = _suiteDetails[2]
-                _data = _data+"['"+_suiteName+"',"+_total+"],"
-        return _data[:-1]
-		
-    def getInduvidualTestSuiteStatistics(self):
-        """
-        To get each and every individual test suite statistics.
-        """
-        _details = "['Suite Name', 'Pass', 'Fail'],"
-        statistics = self.getStatisticsFromHTMLTestOutput()
-        _suiteStats=statistics.split(',')
-        for suite in _suiteStats:
-            if suite.count(':')==6:
-                _suiteDetails = suite.split(':')
-                _suiteName = _suiteDetails[0][1:]
-                _passed = _suiteDetails[3]
-                _failed = _suiteDetails[4]
-                _details = _details + "['"+_suiteName+"',"+_passed+","+_failed+"],"
-        return _details[:-1]
+    def getTotalTestcases(self):
+        """ """
+        totalCases = 0
+        stats = self.reportData
+        for stat in stats:
+            total = stat.split('!~!')[2]
+            totalCases = totalCases + int(total)
+        return totalCases
 
-    def getOverallStatisticsHTML(self):
-        """
-        This will make the overall statistics html page.
-        """
-        chartType = "PieChart"
-        data = self.getOverallStatistics()
-        overallStatisticsTitle = "Overall Statistics"
-        colors = "colors: ['green','red']"
-        script = self.gchart.getChart(chartType,data,overallStatisticsTitle,colors)
-        return script
-		
-    def getTestCoverageStatisticsHTML(self):
-        """
-        This will make the test coverage statistics html page.
-        """
-        chartType = "PieChart"
-        data = self.getTestCoverageStatistics()
-        title = "Test Coverage Statistics"
-        script = self.gchart.getChart(chartType,data,title)
-        return script
-		
-    def getInduvidualTestSuiteStatisticsHTML(self):
-        """
-        This will make Individual Test Suite Statistics HTML page.
-        """
-        chartType = "BarChart"
-        data = self.getInduvidualTestSuiteStatistics()
-        testSuiteStatisticsTitle = "Test Suite Statistics"
-        colors = "colors: ['green','red']"
-        script = self.gchart.getChart(chartType,data,testSuiteStatisticsTitle,colors)
-        return script		
-		
-    def deleteStatisticsFileIfExists(self):
-	"""
-	To delete the Statistics.html file if it is already exists in the mentioned directory.
-	"""
-	try:
-	    os.remove(self.dir+'/Statistics.html')
-	except OSError:
-	    pass
-		
-    def getStatisticsReport(self):
-        """
-        This method will create the source of statistics.html page and return it.
-        """
-        self.deleteStatisticsFileIfExists()
-        pageSource="""
+    def makeReport(self):
+        """ """
+        part1 = """
         <html>
-        <head>
-        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-        """+self.getOverallStatisticsHTML()+self.getTestCoverageStatisticsHTML()+self.getInduvidualTestSuiteStatisticsHTML()+"""
-        </head>
+        <head><title>Overview Report</title><head>
         <body>
-        <div id="Overall Statistics" style="width: 900px; height: 600px;"></div>
-        <div id="Test Coverage Statistics" style="width: 900px; height: 600px;"></div>
-        <div id="Test Suite Statistics" style="width: 900px; height: 600px;"></div>
+        <table>
+        <tr><td><b>Project Name</b></td><td>:
         """
-        f = open(self.dir+'/Statistics.html','w')
-        f.write(pageSource)
+        part2="""</td></tr>
+        <tr><td><b>Language</b></td><td>: Python</td></tr>
+        <tr><td><b>Framework</b></td><td>: Unittest </td></tr>
+        </table>
+        <p> The below are the overview of the automated testsuite / testcase results.
+        <div class="statsDiv">
+        <table id="stats">
+        <thead>    
+        <tr><th>Functionality</th><th>Total</th><th>Pass</th><th>Fail</th><th>Error</th></tr>
+        </thead>
+        """
+        part3="""
+        </table></div>
+        </body>
+        </html>
+        <style>
+        #stats{ background-color : #fff; color : #446bb3; border-collapse:collapse;}
+        #stats thead { background-color: #446bb3  ; color : #fff; font: bold 14px verdana; padding:4px; line-height:30px}
+        #stats tbody tr:nth-child(even) {background: #CCC;}
+        #stats tbody tr:nth-child(odd) {background: #FFF}
+        .statsDiv{display:inline-block;padding-top: 8px;padding-bottom: 10px;margin: 0 auto 20px auto;background-color: #446bb3;border-radius: 10px;-moz-border-radius: 10px;-webkit-border-radius: 10px;color: #446bb3;padding:10px;}    
+        </style>
+        """
+        testResults = ""
+        for stat in self.reportData:
+            testData = stat.split('!~!')
+            testName = testData[0]
+            totalTestcase = testData[2]
+            passed = testData[3]
+            failed = testData[4]
+            error = testData[5]
+            htmlData = "<tr><td>"+testName+"</td><td>"+totalTestcase+"</td><td>"+passed+"</td><td>"+failed+"</td><td>"+error+"</td>"
+            testResults = testResults + htmlData
+        testResults = testResults + "<tr><td>Total</td><td>"+str(self.getTotalTestcases())+"</td><td>"+str(self.getTotalPassed())+"</td><td>"+str(self.getTotalFailed())+"</td><td>"+str(self.getTotalError())+"</td>"
+        page = part1 +self.projectName + part2 + testResults + part3
+        f = open(outputDir+'statistics.html','w')
+        f.write(page)
         f.close
-		
+
 def main(argv):
     if len(argv)<=1:
-        print "please enter folder name."
+        print "Usage:"
+        print "Python Statistics.py <project name> <output dir (optional)>"
     elif len(argv)==2:
-        a = makeStatisticsReport(str(argv[1]))
-        a.getStatisticsReport()
-		
+        a = overviewReport(str(argv[1]))
+        a.makeReport()
+    elif len(argv)==3:
+        a = overviewReport(str(argv[1]),str(argv[2]))
+        a.makeReport()
+
 if __name__ == '__main__':
     main(sys.argv)

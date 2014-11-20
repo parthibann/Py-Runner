@@ -123,7 +123,7 @@ def runtest():
                 _output = open(pwd+"/Output/"+_testModuleName+".html","w")
                 HTMLRunner = HTMLTestRunner.HTMLTestRunner(stream=_output,title=_testModuleName,description="Test case's for the module "+_testModuleName)
                 HTMLRunner.run(suite)
-        subprocess.Popen(['python',pwd+"/ExtLib/Statistics.py","Computenext API Automation",pwd+"/Output/"])
+        subprocess.Popen(['python',pwd+"/ExtLib/Statistics.py","Test Automation",pwd+"/Output/"])
         IndexMaker = HTMLIndexCreator.HTMLIndexCreator(pwd+"/Output/")
         IndexMaker.makeHTMLIndexFile()    
         return "Test completed....."
