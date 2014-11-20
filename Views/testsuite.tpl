@@ -42,9 +42,9 @@ $('.{{suite}}').click( function(){$('input[name={{suite}}]').prop('checked',$(th
 <input type="text" name="testplantxtbox" placeholder="Enter TestPlan Id *" size=14>Build Name :
 <input type="text" name="buildnametxtbox" placeholder="Enter Build Name *" size=14></div>
 <div id="runner">Select Runner : 
-<input type="radio" name="testRunner" class="runnerRadio" value="HTMLTestRunner" checked>HTMLTestRunner
-<input type="radio" name="testRunner" class="runnerRadio" value="TestLinkRunner">TestLinkRunner
-<input type="checkbox" class="selectAllTestCases" />Select All Test Cases
+<label><input type="radio" name="testRunner" class="runnerRadio" value="HTMLTestRunner" checked>HTMLTestRunner</label>
+<label><input type="radio" name="testRunner" class="runnerRadio" value="TestLinkRunner">TestLinkRunner</label>
+<label><input type="checkbox" class="selectAllTestCases" />Select All Test Cases</label>
 <button type="button" class="RunSelectedTests">Run</button></div>
 </div>
 </body>
@@ -77,7 +77,7 @@ font-weight:bold;
 float:left;
 width:25%;
 text-align:left;
-height:93%;
+height:90%;
 overflow:scroll;
 }
 #testCases{
@@ -85,7 +85,7 @@ background-color:white;
 font-weight:bold;
 float:right;
 width:75%;
-height:93%;
+height:90%;
 text-align:left;
 overflow:scroll;
 }

@@ -2,7 +2,7 @@
 <body>
 <title>Test Automation</title>
 <div id="container">
-<div id="pageTitle">Computenext API Test Automation</div>
+<div id="pageTitle">Test Automation</div>
 <div id="space" style="height:0.3%;"></div>
 <div id="resourceLinksContainer">
 <table>
@@ -38,7 +38,7 @@ font-size:10pt;
 font-weight:bold;
 }
 #frame{
-height:91.5%;
+height:91%;
 width:99.8%;
 background-color:#edf0f5;
 }
