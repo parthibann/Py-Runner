@@ -65,22 +65,66 @@ class HTMLIndexCreator():
         part1 = """<html>
         <body>
         <title>Index</title>
-        <div id="container" style="width=100%;text-align:center;">
-        <div id="pageTitle" style="background-color:"""+self.theme+""";text-align:left;font-weight:bold;">Index</div>
-        <div id="whiteSpace" style="height:0.3%;background-color:white;"></div>
-        <div id="TestSuitesTitle" style="width:15%;float:left;background-color:"""+self.theme+""";font-weight:bold;">TestSuites</div>
-        <div id="ResultsTitle" style="width:84.7%;float:right;background-color:"""+self.theme+""";font-weight:bold;">Results</div>
-        <div id="Suites" style="width:15%;float:left;background-color:lightgrey;font-weight:bold;text-align:left;height:95%;overflow:scroll;">
+        <div id="pg_body">
+        <div id="testSuitesTitle">TestSuites</div>
+        <div id="resultsTitle">Results</div>
+        <div id="testSuites">
         """
         part2 = self.makeLinks()
         part3 = """</div>
-        <div id="Results" style="width:84.7%;background-color:white;float:right;text-align:left;height:95%;">
-        <iframe id="loadHTMLResults" name="loadHTMLResults" frameborder="0" style="height:100%;width:100%;" src="Statistics.html"></iframe>
+        <div id="results">
+        <iframe id="loadHTMLResults" name="loadHTMLResults" frameborder="0" src="statistics.html" style="height:100%;width:100%;"></iframe>
         </div>
-        <div id="footer" style="width:100%;text-align:left;color:lightgrey;background-color:"""+self.theme+""";">Test Engineer(s) :"""+testEngineers+"""</div>
+        <div id="footer">Test Engineer(s) :"""+testEngineers+"""</div>
         </div>
         </body>
         </html>
+		<style>
+		body{
+        margin:0;
+        }
+		#pg_body{
+		width=100%;
+		text-align:center;
+		}
+		#testSuitesTitle{
+		width:25%;
+		float:left;
+		background-color:#6495ED;
+		font-weight:bold;
+		color:white;
+		}
+		#resultsTitle{
+		width:75%;
+		float:right;
+		background-color:#6495ED;
+		font-weight:bold;
+		color:white;
+		}
+		#testSuites{
+		width:25%;
+		float:left;
+		background-color:lightgrey;
+		font-weight:bold;
+		text-align:left;
+		height:94%;
+		overflow:scroll;
+		}
+		#results{
+		width:75%;
+		background-color:white;
+		float:right;
+		text-align:left;
+		height:94%;
+		overflow:scroll;
+		}
+		#footer{
+		width:100%;
+		text-align:left;
+		color:lightgrey;
+		background-color:#6495ED;
+		}
+		</style>
         """
         
         page = (part1+part2+part3)
@@ -98,22 +142,23 @@ class HTMLIndexCreator():
                 HTMLFiles.append(_file)
             elif _file.lower().endswith(".htm"):
                 HTMLFiles.append(_file)
+        HTMLFiles.append("statistics.html")
         return HTMLFiles
 
     def deleteIndexFileIfExists(self):
-	"""
-	To delete the index.html file if it is already exists in the mentioned directory.
-	"""
-	try:
-	    os.remove(self.dir+'/index.html')
-	except OSError:
-	    pass
+        """
+        To delete the index.html file if it is already exists in the mentioned directory.
+        """
+        try:
+            os.remove(self.dir+'/index.html')
+        except OSError:
+            pass
     
     def makeLinks(self):
         """
         To make TestSuite Links
         """
-	self.deleteIndexFileIfExists()
+        self.deleteIndexFileIfExists()
         _fileNames = self.getHTMLFileNames()
         _msgPart1 = "<a href=\""
         _msgPart2 = "\" target=\"loadHTMLResults\">"
